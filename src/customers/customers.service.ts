@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -100,6 +101,12 @@ export class CustomersService {
 
   async remove(id: string) {
     await this.findOne(id);
+    const linkedOrders = await this.prisma.order.count({
+      where: { customerId: id, deletedAt: null },
+    });
+    if (linkedOrders > 0) {
+      throw new BadRequestException('该客户存在关联订单，无法删除');
+    }
     await this.prisma.customer.delete({ where: { id } });
     return null;
   }

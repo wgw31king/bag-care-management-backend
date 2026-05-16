@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 import { ORDER_STATUS, WASH_SERVICES } from '../../common/constants/enums';
 import { IsDateTimeString } from '../../common/validators/datetime-string.validator';
+import { NoBase64DataUrl } from '../../common/validators/no-base64-url.validator';
 
 export class CreateOrderDto {
   @IsString()
@@ -47,6 +48,7 @@ export class CreateOrderDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @NoBase64DataUrl()
   defectImages?: string[];
 
   @IsArray()

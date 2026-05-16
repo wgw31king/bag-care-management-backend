@@ -17,7 +17,7 @@ export const WASH_SERVICES = [
 
 export const CUSTOMER_TAGS = ['普通', 'VIP', '储值'] as const;
 
-export const STAFF_STATUS = ['在职', '停用'] as const;
+export const STAFF_STATUS = ['在职', '离职'] as const;
 
 export const PERMISSIONS = [
   'dashboard',

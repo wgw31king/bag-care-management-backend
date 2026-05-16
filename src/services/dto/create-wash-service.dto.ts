@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -7,8 +8,13 @@ import {
   IsString,
   Min,
 } from 'class-validator';
+import { WASH_SERVICES } from '../../common/constants/enums';
 
 export class CreateWashServiceDto {
+  @IsOptional()
+  @IsIn([...WASH_SERVICES])
+  code?: string;
+
   @IsString()
   @IsNotEmpty()
   name: string;

@@ -8,12 +8,14 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { CreateWashServiceDto } from './dto/create-wash-service.dto';
 import { QueryWashServiceDto } from './dto/query-wash-service.dto';
 import { UpdateWashServiceDto } from './dto/update-wash-service.dto';
 import { WashServicesService } from './wash-services.service';
 
 @Controller('services')
+@RequirePermissions('service')
 export class WashServicesController {
   constructor(private services: WashServicesService) {}
 

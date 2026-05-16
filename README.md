@@ -86,8 +86,9 @@ curl -s -X POST http://localhost:3001/api/files/upload \
 | `/customers` | 客户 CRUD |
 | `/services` | 洗护服务配置 |
 | `/staff` | 员工与权限 |
-| `/dashboard/stats` | 仪表盘统计 |
-| `/files/upload` | 瑕疵图片上传 |
+| `/dashboard/summary` | 仪表盘统计（`?date=YYYY-MM-DD` 上海时区） |
+| `/dashboard/revenue-trend` | 营收趋势 `?range=7d\|30d` |
+| `/upload/images` | 瑕疵图上传（multipart `file`，最多 9 张） |
 
 ## 前端联调
 

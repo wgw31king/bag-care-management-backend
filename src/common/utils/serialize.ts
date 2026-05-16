@@ -20,9 +20,12 @@ export function toOrderJson<T extends { amount: unknown; prepay: unknown; create
   };
 }
 
-export function toWashServiceJson<T extends { price: unknown }>(row: T) {
+export function toWashServiceJson<T extends { price: unknown; code?: string | null }>(
+  row: T,
+) {
   return {
     ...row,
+    code: row.code ?? null,
     price: decimalToNumber(row.price as Decimal),
   };
 }

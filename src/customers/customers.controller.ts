@@ -8,12 +8,14 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { QueryCustomerDto } from './dto/query-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Controller('customers')
+@RequirePermissions('customer')
 export class CustomersController {
   constructor(private customers: CustomersService) {}
 

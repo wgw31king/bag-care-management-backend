@@ -56,6 +56,7 @@ export class WashServicesService {
     });
     const row = await this.prisma.washService.create({
       data: {
+        code: dto.code ?? null,
         name: dto.name,
         price: dto.price,
         durationMin: dto.durationMin,
@@ -71,6 +72,7 @@ export class WashServicesService {
     const row = await this.prisma.washService.update({
       where: { id },
       data: {
+        ...(dto.code !== undefined && { code: dto.code }),
         ...(dto.name !== undefined && { name: dto.name }),
         ...(dto.price !== undefined && { price: dto.price }),
         ...(dto.durationMin !== undefined && { durationMin: dto.durationMin }),

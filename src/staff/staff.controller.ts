@@ -8,12 +8,14 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { QueryStaffDto } from './dto/query-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { StaffService } from './staff.service';
 
 @Controller('staff')
+@RequirePermissions('staff')
 export class StaffController {
   constructor(private staff: StaffService) {}
 

@@ -9,6 +9,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { QueryOrderDto } from './dto/query-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -16,6 +17,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrdersService } from './orders.service';
 
 @Controller('orders')
+@RequirePermissions('order')
 export class OrdersController {
   constructor(private orders: OrdersService) {}
 
