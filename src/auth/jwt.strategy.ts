@@ -5,7 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Permission } from '../common/constants/enums';
 
 export interface JwtPayload {
-  sub: string;
+  userId: string;
   displayName: string;
   permissions: Permission[];
 }
@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: JwtPayload) {
-    if (!payload?.sub) {
+    if (!payload?.userId) {
       throw new UnauthorizedException('Invalid token');
     }
     return payload;

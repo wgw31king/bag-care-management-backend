@@ -1,12 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Permission, PERMISSIONS } from '../common/constants/enums';
 import { PrismaService } from '../prisma/prisma.service';
+import { LOGIN_FAILED_MESSAGE } from './auth.constants';
+import { resolveStaffPermissions } from './auth-permissions.util';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './jwt.strategy';
 
@@ -23,20 +20,20 @@ export class AuthService {
       include: { staff: true },
     });
     if (!user) {
-      throw new UnauthorizedException('用户名或密码错误');
+      throw new UnauthorizedException(LOGIN_FAILED_MESSAGE);
     }
     const ok = await bcrypt.compare(dto.password, user.passwordHash);
     if (!ok) {
-      throw new UnauthorizedException('用户名或密码错误');
+      throw new UnauthorizedException(LOGIN_FAILED_MESSAGE);
     }
-    const permissions = this.resolvePermissions(user.staff?.permissions);
+    const permissions = resolveStaffPermissions(user.staff);
     const payload: JwtPayload = {
-      sub: user.id,
+      userId: user.id,
       displayName: user.displayName,
       permissions,
     };
     const token = await this.jwt.signAsync(payload);
-    return { token, displayName: user.displayName };
+    return { token, displayName: user.displayName, permissions };
   }
 
   async me(userId: string) {
@@ -45,22 +42,13 @@ export class AuthService {
       include: { staff: true },
     });
     if (!user) {
-      throw new NotFoundException('用户不存在');
+      throw new UnauthorizedException(LOGIN_FAILED_MESSAGE);
     }
     return {
-      id: user.id,
+      userId: user.id,
       username: user.username,
       displayName: user.displayName,
-      permissions: this.resolvePermissions(user.staff?.permissions),
+      permissions: resolveStaffPermissions(user.staff),
     };
-  }
-
-  private resolvePermissions(raw: unknown): Permission[] {
-    if (!Array.isArray(raw)) {
-      return [...PERMISSIONS];
-    }
-    return raw.filter((p): p is Permission =>
-      (PERMISSIONS as readonly string[]).includes(p as string),
-    );
   }
 }

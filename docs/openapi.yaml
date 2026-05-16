@@ -4,7 +4,7 @@ info:
   description: 包包洗护门店管理系统 REST API
   version: 1.0.0
 servers:
-  - url: http://localhost:3001/api/v1
+  - url: http://localhost:3001/api
     description: Local development
 
 tags:
@@ -77,11 +77,15 @@ components:
         displayName:
           type: string
           description: 前端存入 bagwash_user
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
 
     MeData:
       type: object
       properties:
-        id:
+        userId:
           type: string
         username:
           type: string

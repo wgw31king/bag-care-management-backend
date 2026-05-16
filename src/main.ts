@@ -7,7 +7,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api');
   app.enableCors({
     origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
     credentials: true,
@@ -25,6 +25,6 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3001;
   await app.listen(port);
-  console.log(`Bag Wash API running at http://localhost:${port}/api/v1`);
+  console.log(`Bag Wash API running at http://localhost:${port}/api`);
 }
 bootstrap();

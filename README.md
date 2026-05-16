@@ -29,7 +29,7 @@ npm run prisma:seed
 npm run start:dev
 ```
 
-服务地址：`http://localhost:3001/api/v1`
+服务地址：`http://localhost:3001/api`
 
 静态上传：`http://localhost:3001/uploads/<filename>`
 
@@ -54,7 +54,7 @@ npm run start:dev
 
 ```bash
 # 登录
-curl -s -X POST http://localhost:3001/api/v1/auth/login \
+curl -s -X POST http://localhost:3001/api/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"username":"admin","password":"admin123"}'
 
@@ -62,15 +62,15 @@ curl -s -X POST http://localhost:3001/api/v1/auth/login \
 export TOKEN="<jwt>"
 
 # 订单列表
-curl -s "http://localhost:3001/api/v1/orders?page=1&pageSize=10" \
+curl -s "http://localhost:3001/api/orders?page=1&pageSize=10" \
   -H "Authorization: Bearer $TOKEN"
 
 # 仪表盘
-curl -s http://localhost:3001/api/v1/dashboard/stats \
+curl -s http://localhost:3001/api/dashboard/stats \
   -H "Authorization: Bearer $TOKEN"
 
 # 上传瑕疵图
-curl -s -X POST http://localhost:3001/api/v1/files/upload \
+curl -s -X POST http://localhost:3001/api/files/upload \
   -H "Authorization: Bearer $TOKEN" \
   -F "file=@/path/to/image.jpg"
 ```
@@ -96,7 +96,7 @@ curl -s -X POST http://localhost:3001/api/v1/files/upload \
 建议配置：
 
 ```env
-VITE_API_BASE=http://localhost:3001/api/v1
+VITE_API_BASE=http://localhost:3001/api
 ```
 
 请求头：`Authorization: Bearer <token>`
