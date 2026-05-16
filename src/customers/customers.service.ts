@@ -104,14 +104,39 @@ export class CustomersService {
     return null;
   }
 
-  /** 按手机号聚合刷新 orderCount / lastVisit */
+  /** 按手机号查找或自动创建客户（用于订单关联） */
+  async resolveByPhone(input: {
+    phone: string;
+    customerName: string;
+    wechatNote?: string;
+  }): Promise<string> {
+    const existing = await this.prisma.customer.findUnique({
+      where: { phone: input.phone },
+    });
+    if (existing) {
+      return existing.id;
+    }
+    const created = await this.prisma.customer.create({
+      data: {
+        name: input.customerName,
+        phone: input.phone,
+        wechat: input.wechatNote ?? '',
+        tag: '普通',
+        remark: '',
+        orderCount: 0,
+      },
+    });
+    return created.id;
+  }
+
+  /** 按手机号聚合刷新 orderCount / lastVisit（不含已软删订单） */
   async refreshStatsByPhone(phone: string) {
     const customer = await this.prisma.customer.findUnique({ where: { phone } });
     if (!customer) {
       return;
     }
     const orders = await this.prisma.order.findMany({
-      where: { phone },
+      where: { phone, deletedAt: null },
       select: { orderTime: true },
       orderBy: { orderTime: 'desc' },
     });

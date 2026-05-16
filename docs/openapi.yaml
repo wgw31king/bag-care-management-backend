@@ -513,7 +513,7 @@ paths:
           description: 不存在
     delete:
       tags: [orders]
-      summary: 删除订单
+      summary: 软删除订单（设置 deletedAt）
       security:
         - bearerAuth: []
       parameters:
@@ -525,6 +525,34 @@ paths:
       responses:
         '200':
           description: 成功
+
+  /orders/{id}/status:
+    patch:
+      tags: [orders]
+      summary: 仅更新订单状态（工作流）
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: '#/components/schemas/OrderStatus'
+      responses:
+        '200':
+          description: 成功
+        '404':
+          description: 不存在
 
   /customers:
     get:

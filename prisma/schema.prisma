@@ -63,13 +63,15 @@ model Order {
   prepay           Decimal  @db.Decimal(12, 2)
   remark           String   @default("")
   status           String   @default("pending_receive")
-  createdAt        BigInt   @map("created_at")
-  customerId       String?  @map("customer_id")
+  createdAt        BigInt    @map("created_at")
+  deletedAt        DateTime? @map("deleted_at")
+  customerId       String?   @map("customer_id")
   customer         Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 
   @@index([phone])
   @@index([status])
   @@index([orderTime])
+  @@index([deletedAt])
   @@map("orders")
 }
 

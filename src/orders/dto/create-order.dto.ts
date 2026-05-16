@@ -9,6 +9,7 @@ import {
   Min,
 } from 'class-validator';
 import { ORDER_STATUS, WASH_SERVICES } from '../../common/constants/enums';
+import { IsDateTimeString } from '../../common/validators/datetime-string.validator';
 
 export class CreateOrderDto {
   @IsString()
@@ -55,10 +56,12 @@ export class CreateOrderDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsDateTimeString()
   orderTime: string;
 
   @IsString()
   @IsNotEmpty()
+  @IsDateTimeString()
   expectPickupTime: string;
 
   @IsNumber()
@@ -73,6 +76,7 @@ export class CreateOrderDto {
   @IsString()
   remark?: string;
 
+  @IsOptional()
   @IsIn([...ORDER_STATUS])
-  status: string;
+  status?: string;
 }

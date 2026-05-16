@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { ORDER_STATUS } from '../common/constants/enums';
 import { generateOrderNo } from '../common/utils/order-no';
 import { toOrderJson } from '../common/utils/serialize';
 import { CustomersService } from '../customers/customers.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { QueryOrderDto } from './dto/query-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+
+const NOT_DELETED: Prisma.OrderWhereInput = { deletedAt: null };
 
 @Injectable()
 export class OrdersService {
@@ -15,10 +19,8 @@ export class OrdersService {
     private customers: CustomersService,
   ) {}
 
-  async findAll(query: QueryOrderDto) {
-    const page = query.page ?? 1;
-    const pageSize = query.pageSize ?? 10;
-    const where: Prisma.OrderWhereInput = {};
+  private buildListWhere(query: QueryOrderDto): Prisma.OrderWhereInput {
+    const where: Prisma.OrderWhereInput = { ...NOT_DELETED };
 
     if (query.status) {
       where.status = query.status;
@@ -32,6 +34,13 @@ export class OrdersService {
         { brand: { contains: kw } },
       ];
     }
+    return where;
+  }
+
+  async findAll(query: QueryOrderDto) {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const where = this.buildListWhere(query);
 
     const [rows, total] = await Promise.all([
       this.prisma.order.findMany({
@@ -52,7 +61,9 @@ export class OrdersService {
   }
 
   async findOne(id: string) {
-    const row = await this.prisma.order.findUnique({ where: { id } });
+    const row = await this.prisma.order.findFirst({
+      where: { id, ...NOT_DELETED },
+    });
     if (!row) {
       throw new NotFoundException('订单不存在');
     }
@@ -60,8 +71,10 @@ export class OrdersService {
   }
 
   async create(dto: CreateOrderDto) {
-    const customer = await this.prisma.customer.findUnique({
-      where: { phone: dto.phone },
+    const customerId = await this.customers.resolveByPhone({
+      phone: dto.phone,
+      customerName: dto.customerName,
+      wechatNote: dto.wechatNote,
     });
     const row = await this.prisma.order.create({
       data: {
@@ -81,9 +94,9 @@ export class OrdersService {
         amount: dto.amount,
         prepay: dto.prepay,
         remark: dto.remark ?? '',
-        status: dto.status,
+        status: dto.status ?? ORDER_STATUS[0],
         createdAt: BigInt(Date.now()),
-        customerId: customer?.id ?? null,
+        customerId,
       },
     });
     await this.customers.refreshStatsByPhone(dto.phone);
@@ -91,18 +104,16 @@ export class OrdersService {
   }
 
   async update(id: string, dto: UpdateOrderDto) {
-    const existing = await this.prisma.order.findUnique({ where: { id } });
-    if (!existing) {
-      throw new NotFoundException('订单不存在');
-    }
+    const existing = await this.findActiveOrThrow(id);
     const phone = dto.phone ?? existing.phone;
-    let customerId = existing.customerId;
-    if (dto.phone && dto.phone !== existing.phone) {
-      const customer = await this.prisma.customer.findUnique({
-        where: { phone: dto.phone },
-      });
-      customerId = customer?.id ?? null;
-    }
+    const customerId = dto.phone
+      ? await this.customers.resolveByPhone({
+          phone,
+          customerName: dto.customerName ?? existing.customerName,
+          wechatNote: dto.wechatNote ?? existing.wechatNote,
+        })
+      : existing.customerId;
+
     const row = await this.prisma.order.update({
       where: { id },
       data: {
@@ -136,13 +147,32 @@ export class OrdersService {
     return toOrderJson(row);
   }
 
+  async updateStatus(id: string, dto: UpdateOrderStatusDto) {
+    await this.findActiveOrThrow(id);
+    const row = await this.prisma.order.update({
+      where: { id },
+      data: { status: dto.status },
+    });
+    return toOrderJson(row);
+  }
+
   async remove(id: string) {
-    const existing = await this.prisma.order.findUnique({ where: { id } });
-    if (!existing) {
-      throw new NotFoundException('订单不存在');
-    }
-    await this.prisma.order.delete({ where: { id } });
+    const existing = await this.findActiveOrThrow(id);
+    await this.prisma.order.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
     await this.customers.refreshStatsByPhone(existing.phone);
     return null;
+  }
+
+  private async findActiveOrThrow(id: string) {
+    const row = await this.prisma.order.findFirst({
+      where: { id, ...NOT_DELETED },
+    });
+    if (!row) {
+      throw new NotFoundException('订单不存在');
+    }
+    return row;
   }
 }

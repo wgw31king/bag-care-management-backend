@@ -8,6 +8,7 @@ export class DashboardService {
 
   async getStats() {
     const today = new Date().toISOString().slice(0, 10);
+    const active = { deletedAt: null };
     const [
       todayCount,
       washingCount,
@@ -17,19 +18,25 @@ export class DashboardService {
       prepayAgg,
     ] = await Promise.all([
       this.prisma.order.count({
-        where: { orderTime: { startsWith: today } },
+        where: { ...active, orderTime: { startsWith: today } },
       }),
       this.prisma.order.count({
-        where: { status: { in: ['washing', 'repairing'] } },
+        where: { ...active, status: { in: ['washing', 'repairing'] } },
       }),
       this.prisma.order.count({
-        where: { status: 'wait_pickup' },
+        where: { ...active, status: 'wait_pickup' },
       }),
       this.prisma.order.count({
-        where: { status: 'picked_up' },
+        where: { ...active, status: 'picked_up' },
       }),
-      this.prisma.order.aggregate({ _sum: { amount: true } }),
-      this.prisma.order.aggregate({ _sum: { prepay: true } }),
+      this.prisma.order.aggregate({
+        where: active,
+        _sum: { amount: true },
+      }),
+      this.prisma.order.aggregate({
+        where: active,
+        _sum: { prepay: true },
+      }),
     ]);
 
     return {
