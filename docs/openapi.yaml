@@ -1,0 +1,832 @@
+openapi: 3.0.3
+info:
+  title: Bag Wash Manage API
+  description: 包包洗护门店管理系统 REST API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001/api/v1
+    description: Local development
+
+tags:
+  - name: auth
+  - name: orders
+  - name: customers
+  - name: services
+  - name: staff
+  - name: dashboard
+  - name: files
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: ok
+        data: {}
+
+    ApiError:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 401
+        message:
+          type: string
+        data:
+          nullable: true
+
+    PageResult:
+      type: object
+      properties:
+        list:
+          type: array
+          items: {}
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    LoginData:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT，前端存入 bagwash_token
+        displayName:
+          type: string
+          description: 前端存入 bagwash_user
+
+    MeData:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: string
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        orderNo:
+          type: string
+        customerName:
+          type: string
+        phone:
+          type: string
+        wechatNote:
+          type: string
+        brand:
+          type: string
+        style:
+          type: string
+        color:
+          type: string
+        material:
+          type: string
+        defectDesc:
+          type: string
+        defectImages:
+          type: array
+          items:
+            type: string
+        washServices:
+          type: array
+          items:
+            $ref: '#/components/schemas/WashServiceCode'
+        orderTime:
+          type: string
+          example: '2026-05-14 10:01:00'
+        expectPickupTime:
+          type: string
+          example: '2026-05-17 18:00:00'
+        amount:
+          type: number
+        prepay:
+          type: number
+        remark:
+          type: string
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        createdAt:
+          type: integer
+          format: int64
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - customerName
+        - phone
+        - brand
+        - style
+        - color
+        - material
+        - defectDesc
+        - washServices
+        - orderTime
+        - expectPickupTime
+        - amount
+        - prepay
+        - status
+      properties:
+        customerName:
+          type: string
+        phone:
+          type: string
+        wechatNote:
+          type: string
+        brand:
+          type: string
+        style:
+          type: string
+        color:
+          type: string
+        material:
+          type: string
+        defectDesc:
+          type: string
+        defectImages:
+          type: array
+          items:
+            type: string
+        washServices:
+          type: array
+          items:
+            $ref: '#/components/schemas/WashServiceCode'
+        orderTime:
+          type: string
+        expectPickupTime:
+          type: string
+        amount:
+          type: number
+        prepay:
+          type: number
+        remark:
+          type: string
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+
+    UpdateOrderRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateOrderRequest'
+      description: 所有字段可选（PATCH 语义由 PUT 部分字段实现）
+
+    OrderStatus:
+      type: string
+      enum:
+        - pending_receive
+        - washing
+        - repairing
+        - finished
+        - wait_pickup
+        - picked_up
+
+    WashServiceCode:
+      type: string
+      enum:
+        - fine_wash
+        - deep_stain
+        - hardware_polish
+        - color_restore
+        - care
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        wechat:
+          type: string
+        tag:
+          $ref: '#/components/schemas/CustomerTag'
+        orderCount:
+          type: integer
+        lastVisit:
+          type: string
+          format: date
+          nullable: true
+        remark:
+          type: string
+
+    CreateCustomerRequest:
+      type: object
+      required: [name, phone]
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        wechat:
+          type: string
+        tag:
+          $ref: '#/components/schemas/CustomerTag'
+        remark:
+          type: string
+
+    CustomerTag:
+      type: string
+      enum: [普通, VIP, 储值]
+
+    WashService:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        durationMin:
+          type: integer
+        enabled:
+          type: boolean
+        sort:
+          type: integer
+
+    CreateWashServiceRequest:
+      type: object
+      required: [name, price, durationMin]
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        durationMin:
+          type: integer
+        enabled:
+          type: boolean
+        sort:
+          type: integer
+
+    Staff:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+        status:
+          $ref: '#/components/schemas/StaffStatus'
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+
+    CreateStaffRequest:
+      type: object
+      required: [name, phone, role, permissions]
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+        status:
+          $ref: '#/components/schemas/StaffStatus'
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+
+    StaffStatus:
+      type: string
+      enum: [在职, 停用]
+
+    Permission:
+      type: string
+      enum:
+        - dashboard
+        - order
+        - customer
+        - service
+        - staff
+        - finance
+
+    DashboardStats:
+      type: object
+      properties:
+        todayCount:
+          type: integer
+        washingCount:
+          type: integer
+        waitPickupCount:
+          type: integer
+        doneCount:
+          type: integer
+        revenue:
+          type: number
+        prepay:
+          type: number
+
+    UploadResult:
+      type: object
+      properties:
+        url:
+          type: string
+          example: /uploads/abc.jpg
+
+paths:
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: 登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginData'
+        '401':
+          description: 用户名或密码错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: 登出（客户端清除 token 即可）
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功
+
+  /auth/me:
+    get:
+      tags: [auth]
+      summary: 当前用户
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MeData'
+        '401':
+          description: 未授权
+
+  /orders:
+    get:
+      tags: [orders]
+      summary: 订单列表（分页）
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: keyword
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/OrderStatus'
+      responses:
+        '200':
+          description: 成功
+    post:
+      tags: [orders]
+      summary: 新建订单
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: 创建成功
+        '422':
+          description: 校验失败
+
+  /orders/{id}:
+    get:
+      tags: [orders]
+      summary: 订单详情
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+        '404':
+          description: 不存在
+    put:
+      tags: [orders]
+      summary: 更新订单
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: 成功
+        '404':
+          description: 不存在
+    delete:
+      tags: [orders]
+      summary: 删除订单
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+
+  /customers:
+    get:
+      tags: [customers]
+      summary: 客户列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+        - name: keyword
+          in: query
+          schema:
+            type: string
+        - name: tag
+          in: query
+          schema:
+            $ref: '#/components/schemas/CustomerTag'
+      responses:
+        '200':
+          description: 成功
+    post:
+      tags: [customers]
+      summary: 新建客户
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+      responses:
+        '201':
+          description: 成功
+        '409':
+          description: 手机号冲突
+
+  /customers/{id}:
+    get:
+      tags: [customers]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+    put:
+      tags: [customers]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+      responses:
+        '200':
+          description: 成功
+    delete:
+      tags: [customers]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+
+  /services:
+    get:
+      tags: [services]
+      summary: 洗护服务配置列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+        - name: keyword
+          in: query
+          schema:
+            type: string
+        - name: enabled
+          in: query
+          schema:
+            type: string
+            enum: ['0', '1']
+      responses:
+        '200':
+          description: 成功
+    post:
+      tags: [services]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWashServiceRequest'
+      responses:
+        '201':
+          description: 成功
+
+  /services/{id}:
+    get:
+      tags: [services]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+    put:
+      tags: [services]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWashServiceRequest'
+      responses:
+        '200':
+          description: 成功
+    delete:
+      tags: [services]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+
+  /staff:
+    get:
+      tags: [staff]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+        - name: keyword
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/StaffStatus'
+      responses:
+        '200':
+          description: 成功
+    post:
+      tags: [staff]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStaffRequest'
+      responses:
+        '201':
+          description: 成功
+
+  /staff/{id}:
+    get:
+      tags: [staff]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+    put:
+      tags: [staff]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStaffRequest'
+      responses:
+        '200':
+          description: 成功
+    delete:
+      tags: [staff]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+
+  /dashboard/stats:
+    get:
+      tags: [dashboard]
+      summary: 仪表盘统计
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DashboardStats'
+
+  /files/upload:
+    post:
+      tags: [files]
+      summary: 瑕疵图片上传
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UploadResult'
+        '400':
+          description: 文件类型或大小错误
