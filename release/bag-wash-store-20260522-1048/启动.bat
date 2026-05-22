@@ -1,3 +1,3 @@
 @echo off
 cd /d "%~dp0"
-call install.bat
+call deploy\start.bat

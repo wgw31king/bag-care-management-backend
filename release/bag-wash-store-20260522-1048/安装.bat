@@ -1,3 +1,3 @@
 @echo off
 cd /d "%~dp0"
-call stop-db.bat
+call deploy\install.bat
