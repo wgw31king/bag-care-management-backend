@@ -1,5 +1,5 @@
 包包洗护门店系统 合并安装包
-打包时间: 2026-05-22 08:48:03
+打包时间: 2026-05-22 09:50:36
 后端路径: /Users/wahhh/bag-wash-manage-backend
 前端路径: /Users/wahhh/bag-wash-manage
 

@@ -34,6 +34,7 @@ if [[ ! -f "$FRONTEND/package.json" ]]; then
 fi
 
 echo "==> 清理旧产物"
+rm -rf "$BACKEND/release"/bag-wash-store-*
 rm -rf "$OUT" "$ZIP"
 mkdir -p "$OUT/backend" "$OUT/frontend" "$OUT/uploads" "$OUT/deploy"
 
@@ -96,7 +97,7 @@ cat > "$OUT/版本说明.txt" <<EOF
   frontend/  前端源码（安装时 npm build）
   deploy/    Windows 脚本
 
-首次: deploy\\00-一键安装.bat
+首次: deploy\\install.bat
 启动: deploy\\01-启动系统.bat
 访问: http://localhost:3001
 账号: admin / admin
@@ -113,4 +114,4 @@ echo "  文件夹: $OUT"
 echo "  ZIP:     $ZIP"
 echo "  大小:    $(du -sh "$ZIP" | cut -f1)"
 echo "=========================================="
-echo "发给客户后: 解压 → 安装 Node + Docker → deploy\\00-一键安装.bat"
+echo "发给客户后: 解压 → 安装 Node + Docker → deploy\\install.bat"
