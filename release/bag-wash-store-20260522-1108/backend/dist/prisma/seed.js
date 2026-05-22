@@ -35,8 +35,14 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const bcrypt = __importStar(require("bcrypt"));
-const enums_1 = require("../src/common/constants/enums");
 const prisma = new client_1.PrismaClient();
+const PERMISSIONS = [
+    'dashboard',
+    'order',
+    'customer',
+    'service',
+    'staff',
+];
 const ADMIN_PHONE = '13907511716';
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'admin';
@@ -53,7 +59,7 @@ async function main() {
             phone: ADMIN_PHONE,
             role: '店长',
             status: '在职',
-            permissions: [...enums_1.PERMISSIONS],
+            permissions: [...PERMISSIONS],
         },
     });
     await prisma.user.create({

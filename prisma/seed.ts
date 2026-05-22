@@ -1,8 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { PERMISSIONS } from '../src/common/constants/enums';
 
 const prisma = new PrismaClient();
+
+/** 与 src/common/constants/enums 一致；seed 不依赖 src，便于 Windows 发布包仅含 dist */
+const PERMISSIONS = [
+  'dashboard',
+  'order',
+  'customer',
+  'service',
+  'staff',
+] as const;
 
 const ADMIN_PHONE = '13907511716';
 const ADMIN_USERNAME = 'admin';
