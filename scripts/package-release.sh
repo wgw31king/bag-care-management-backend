@@ -90,13 +90,13 @@ cp "$BACKEND/解压必读.txt" "$OUT/"
 
 cat > "$OUT/安装.bat" <<'EOF'
 @echo off
-cd /d "%~dp0deploy"
-call install.bat
+cd /d "%~dp0"
+call deploy\install.bat
 EOF
 cat > "$OUT/启动.bat" <<'EOF'
 @echo off
-cd /d "%~dp0deploy"
-call start.bat
+cd /d "%~dp0"
+call deploy\start.bat
 EOF
 
 cat > "$OUT/版本说明.txt" <<EOF
