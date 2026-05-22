@@ -7,7 +7,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { PERMISSIONS, STAFF_STATUS } from '../../common/constants/enums';
+import { ASSIGNABLE_PERMISSIONS, STAFF_STATUS } from '../../common/constants/enums';
 
 export class CreateStaffDto {
   @IsString()
@@ -28,17 +28,17 @@ export class CreateStaffDto {
 
   @IsArray()
   @ArrayNotEmpty()
-  @IsIn([...PERMISSIONS], { each: true })
+  @IsIn([...ASSIGNABLE_PERMISSIONS], { each: true })
   permissions: string[];
 
-  /** 可选：为员工创建登录账号（非 admin） */
-  @IsOptional()
+  /** 新建员工须同时提供登录账号与初始密码 */
   @IsString()
+  @IsNotEmpty()
   @MinLength(2)
-  username?: string;
+  username: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @MinLength(6)
-  password?: string;
+  password: string;
 }

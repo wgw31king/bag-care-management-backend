@@ -8,6 +8,10 @@ export interface JwtPayload {
   userId: string;
   displayName: string;
   permissions: Permission[];
+  username?: string;
+  role?: string;
+  /** 门店管理员：admin 账号或岗位「店长」 */
+  isManager?: boolean;
 }
 
 @Injectable()

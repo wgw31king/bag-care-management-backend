@@ -5,7 +5,7 @@ import { QueryDashboardDto } from './dto/query-dashboard.dto';
 import { QueryRevenueTrendDto } from './dto/query-revenue-trend.dto';
 
 @Controller('dashboard')
-@RequirePermissions('dashboard', 'finance')
+@RequirePermissions('dashboard')
 export class DashboardController {
   constructor(private dashboard: DashboardService) {}
 

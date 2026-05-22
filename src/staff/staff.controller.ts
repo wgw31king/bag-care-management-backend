@@ -7,15 +7,19 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
-import { RequirePermissions } from '../common/decorators/permissions.decorator';
+import { Request } from 'express';
+import { ManagerGuard } from '../common/guards/manager.guard';
+import { JwtPayload } from '../auth/jwt.strategy';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { QueryStaffDto } from './dto/query-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { StaffService } from './staff.service';
 
 @Controller('staff')
-@RequirePermissions('staff')
+@UseGuards(ManagerGuard)
 export class StaffController {
   constructor(private staff: StaffService) {}
 
@@ -35,8 +39,12 @@ export class StaffController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateStaffDto) {
-    return this.staff.update(id, dto);
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateStaffDto,
+    @Req() req: Request & { user: JwtPayload },
+  ) {
+    return this.staff.update(id, dto, req.user);
   }
 
   @Delete(':id')

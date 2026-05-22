@@ -44,13 +44,26 @@ const { data } = await request.post('/upload/images', formData)
 // data.urls 或 data.url 写入 form.defectImages
 ```
 
-**不要**再使用 `FileReader` 转 base64。保存订单时 `defectImages` 仅传 URL。
+**不要**再使用 `FileReader` 转 base64。保存订单时 `defectImages` 仅传相对路径 URL（如 `/uploads/xxx.jpg`）。
 
-## 5. `Dashboard.vue`
+展示图片时用 `resolveUploadUrl()`（`src/utils/upload-url.js`）拼到 API 源站，例如 `http://localhost:3001/uploads/xxx.jpg`；开发环境也可在 `vite.config.js` 代理 `/uploads`。
+
+## 5. 员工登录与切换用户
+
+- **新建**员工：登录账号与初始密码**必填且须同时提交**（后端 `CreateStaffDto` 强制）。
+- **编辑**已有员工：管理员可只改资料/只改账号/只改密码；密码留空表示不改。无账号的旧员工补建登录仍须账号+密码同时填。
+- 右上角 **切换用户**：`GET /api/auth/switchable-users` 列出在职且已绑账号的员工；输入对方密码后走 `POST /api/auth/login` 换 JWT，菜单按 `permissions` 隐藏。
+- **员工管理**仅 `isManager`（`admin` 或岗位「店长」）可访问 ` /api/staff/*`；普通员工即使勾选旧版「员工权限」也不可编辑。
+- 可分配权限仅：`dashboard`、`order`、`customer`、`service`（无 `finance`、`staff`）。
+- 店长角色（`role === 店长`）登录后 `isManager: true`，业务接口仍拥有全部模块权限。
+
+## 6. `Dashboard.vue`
 
 ```js
 const { data } = await request.get('/dashboard/summary', { params: { date: '2026-05-17' } })
-// data.todayCount, washingCount, waitPickupCount, doneCount, revenue, prepay
+// data.todayCount、revenue、prepay 均按 date 当日（orderTime 日期前缀，北京时间 UTC+8）统计
+// washingCount、waitPickupCount、doneCount 为全库实时状态计数
+// 前端日期工具：utils/beijing-date.js，与后端 common/utils/beijing-date.ts 一致
 ```
 
 可选：`GET /dashboard/revenue-trend?range=7d` 替换「模拟汇总」文案。

@@ -346,7 +346,13 @@ components:
 
     DashboardStats:
       type: object
+      description: |
+        todayCount、revenue、prepay 按 query date（默认北京时间今日）与 orderTime 日期前缀统计；
+        washingCount、waitPickupCount、doneCount 为全库有效订单状态计数。
       properties:
+        date:
+          type: string
+          format: date
         todayCount:
           type: integer
         washingCount:

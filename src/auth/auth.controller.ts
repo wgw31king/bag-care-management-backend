@@ -24,4 +24,10 @@ export class AuthController {
   me(@Req() req: Request & { user: JwtPayload }) {
     return this.auth.me(req.user.userId);
   }
+
+  /** 右上角切换用户：列出已配置登录账号的在职员工 */
+  @Get('switchable-users')
+  switchableUsers() {
+    return this.auth.listSwitchableUsers();
+  }
 }

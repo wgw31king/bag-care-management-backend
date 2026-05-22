@@ -19,13 +19,18 @@ export const CUSTOMER_TAGS = ['普通', 'VIP', '储值'] as const;
 
 export const STAFF_STATUS = ['在职', '离职'] as const;
 
-export const PERMISSIONS = [
+/** 可分配给普通员工的模块权限（不含 staff、finance） */
+export const ASSIGNABLE_PERMISSIONS = [
   'dashboard',
   'order',
   'customer',
   'service',
+] as const;
+
+/** 含 staff（仅店长/admin 通过 isManager 管理员工，不必勾选） */
+export const PERMISSIONS = [
+  ...ASSIGNABLE_PERMISSIONS,
   'staff',
-  'finance',
 ] as const;
 
 export type OrderStatus = (typeof ORDER_STATUS)[number];
