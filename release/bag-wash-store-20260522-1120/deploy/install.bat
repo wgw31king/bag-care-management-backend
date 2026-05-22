@@ -84,8 +84,8 @@ if not exist "%BAGWASH_ROOT%\frontend\dist\index.html" (
   echo [ERROR] Missing frontend\dist\index.html
   goto end
 )
-if not exist "%BAGWASH_ROOT%\backend\dist\main.js" (
-  echo [ERROR] Missing backend\dist\main.js
+if not exist "%BAGWASH_ROOT%\backend\dist\src\main.js" (
+  echo [ERROR] Missing backend\dist\src\main.js
   goto end
 )
 

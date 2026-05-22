@@ -35,6 +35,6 @@ echo http://localhost:3001
 echo user admin  pass admin
 echo Close this window to stop.
 echo.
-node dist\main.js
+node dist\src\main.js
 pause
 endlocal
