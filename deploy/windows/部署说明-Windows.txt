@@ -1,27 +1,23 @@
 包包洗护门店系统 - Windows 部署说明
 ========================================
 
-【不是缺软件】若脚本报乱码/“不是内部或外部命令”，
-请改用英文脚本（避免编码问题）：
-  deploy\install.bat   首次安装
-  deploy\start.bat     日常启动
-  deploy\stop-db.bat   停止数据库
+【脚本闪退、看不到报错】
+  请双击: deploy\00-install.bat 或 deploy\01-start.bat
+  会打开黑色窗口并保持不关。
+  若仍失败，查看解压目录下的 install-log.txt
 
-客户电脑需安装：
-  1. Node.js 18 或 20（https://nodejs.org/）
-  2. Docker Desktop（建议开机自启）
+【推荐脚本】
+  deploy\00-install.bat  首次安装（等同 install.bat）
+  deploy\01-start.bat      日常启动
+  deploy\install.bat     也可直接双击
+  deploy\start.bat
+  deploy\stop-db.bat
+
+需安装: Node.js 18+ 、 Docker Desktop（建议开机自启）
 
 【首次】
-  1. 解压 zip 到 D:\bag-wash-store
-  2. 双击 deploy\install.bat
-  3. 双击 deploy\start.bat
-  4. 浏览器 http://localhost:3001
-     账号 admin  密码 admin
-
-【日常】
-  启动: deploy\start.bat
-  访问: http://localhost:3001
-
-【备份】
-  数据库: Docker 数据卷
-  图片: uploads 文件夹
+  1. 解压完整 zip（须有 backend 和 frontend 文件夹）
+  2. 双击 deploy\00-install.bat
+  3. 等待 15-30 分钟
+  4. 双击 deploy\01-start.bat
+  5. 浏览器 http://localhost:3001  账号 admin 密码 admin
