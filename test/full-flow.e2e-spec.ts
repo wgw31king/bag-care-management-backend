@@ -11,6 +11,19 @@ describe('Full stack flow (e2e)', () => {
   beforeAll(async () => {
     app = await createTestApp();
     adminToken = await loginAsAdmin(app);
+    await request(app.getHttpServer())
+      .post('/api/staff')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: '测试技师',
+        phone: `138${Date.now().toString().slice(-8)}`,
+        role: '店员',
+        status: '在职',
+        permissions: ['dashboard', 'order'],
+        username: 'tech',
+        password: 'tech123',
+      })
+      .expect(201);
     const techRes = await request(app.getHttpServer())
       .post('/api/auth/login')
       .send({ username: 'tech', password: 'tech123' });

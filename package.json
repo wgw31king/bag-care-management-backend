@@ -20,7 +20,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "prisma db seed"
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:seed": "prisma db seed",
+    "package:release": "bash scripts/package-release.sh"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

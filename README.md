@@ -19,7 +19,7 @@ npx prisma migrate dev
 npm run prisma:seed
 ```
 
-默认管理员：`admin` / `admin123`
+默认管理员：`admin` / `admin`（刘亮，13907511716）
 
 登录后 token 对应前端 `localStorage` 键名 `bagwash_token`，显示名 `bagwash_user`。
 
@@ -56,7 +56,7 @@ npm run start:dev
 # 登录
 curl -s -X POST http://localhost:3001/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"admin","password":"admin"}'
 
 # 将返回的 token 填入
 export TOKEN="<jwt>"

@@ -61,12 +61,12 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('returns token, displayName and all permissions for manager', async () => {
-      managerUser.passwordHash = await bcrypt.hash('admin123', 4);
+      managerUser.passwordHash = await bcrypt.hash('admin', 4);
       prisma.user.findUnique.mockResolvedValue(managerUser);
 
       const result = await service.login({
         username: 'admin',
-        password: 'admin123',
+        password: 'admin',
       });
 
       expect(result).toEqual({

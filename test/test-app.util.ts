@@ -26,7 +26,7 @@ export async function createTestApp(): Promise<NestExpressApplication> {
 export async function loginAsAdmin(app: NestExpressApplication): Promise<string> {
   const res = await request(app.getHttpServer())
     .post('/api/auth/login')
-    .send({ username: 'admin', password: 'admin123' })
+    .send({ username: 'admin', password: 'admin' })
     .expect(201);
   return res.body.data.token as string;
 }

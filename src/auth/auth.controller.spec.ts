@@ -29,11 +29,11 @@ describe('AuthController', () => {
     authService.login.mockResolvedValue(payload);
 
     await expect(
-      controller.login({ username: 'admin', password: 'admin123' }),
+      controller.login({ username: 'admin', password: 'admin' }),
     ).resolves.toEqual(payload);
     expect(authService.login).toHaveBeenCalledWith({
       username: 'admin',
-      password: 'admin123',
+      password: 'admin',
     });
   });
 
