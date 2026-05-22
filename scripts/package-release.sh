@@ -1,16 +1,35 @@
 #!/usr/bin/env bash
-# Mac 打包：前后端合并为一个 zip，Windows 上执行「一键安装」完成部署
+# 前后端合并打包（Mac 开发机 → Windows 门店一键安装）
+#
+# 默认路径：
+#   后端  /Users/wahhh/bag-wash-manage-backend
+#   前端  /Users/wahhh/bag-wash-manage
+#
+# 用法：
+#   ./scripts/package-release.sh
+#   BACKEND_DIR=... FRONTEND_DIR=... ./scripts/package-release.sh
+
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-FRONTEND="${FRONTEND_DIR:-$ROOT/../bag-wash-manage}"
-STAMP="$(date +%Y%m%d)"
-OUT="$ROOT/release/bag-wash-store-$STAMP"
-ZIP="$ROOT/release/bag-wash-store-$STAMP.zip"
+BACKEND="${BACKEND_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
+FRONTEND="${FRONTEND_DIR:-/Users/wahhh/bag-wash-manage}"
+STAMP="$(date +%Y%m%d-%H%M)"
+OUT="$BACKEND/release/bag-wash-store-$STAMP"
+ZIP="$BACKEND/release/bag-wash-store-$STAMP.zip"
 
-if [[ ! -d "$FRONTEND" ]]; then
-  echo "错误: 未找到前端项目 $FRONTEND"
-  echo "用法: FRONTEND_DIR=/path/to/bag-wash-manage ./scripts/package-release.sh"
+echo "=========================================="
+echo "  包包洗护 - 合并打包"
+echo "  后端: $BACKEND"
+echo "  前端: $FRONTEND"
+echo "=========================================="
+
+if [[ ! -f "$BACKEND/package.json" ]]; then
+  echo "错误: 后端目录无效 $BACKEND"
+  exit 1
+fi
+if [[ ! -f "$FRONTEND/package.json" ]]; then
+  echo "错误: 前端目录无效 $FRONTEND"
+  echo "请设置 FRONTEND_DIR=/Users/wahhh/bag-wash-manage"
   exit 1
 fi
 
@@ -18,25 +37,24 @@ echo "==> 清理旧产物"
 rm -rf "$OUT" "$ZIP"
 mkdir -p "$OUT/backend" "$OUT/frontend" "$OUT/uploads" "$OUT/deploy"
 
-echo "==> 构建后端 $ROOT"
-cd "$ROOT"
-if [[ ! -d node_modules/@nestjs/core ]]; then
+echo "==> 构建后端"
+cd "$BACKEND"
+if [[ ! -d node_modules/@nestjs/core ]] || [[ ! -f node_modules/.bin/nest ]]; then
+  echo "    安装后端依赖..."
   npm ci
 fi
 npm run build
 npx prisma generate
 
-echo "==> 组装发布包（不含 node_modules）"
-cd "$ROOT"
+echo "==> 复制后端到发布包"
 cp -R dist "$OUT/backend/dist"
 cp -R prisma "$OUT/backend/prisma"
 cp package.json package-lock.json "$OUT/backend/"
 cp docker-compose.yml "$OUT/"
-cp -R deploy/windows/. "$OUT/deploy/"
-cp "$ROOT/deploy/windows/部署说明-Windows.txt" "$OUT/"
+cp -R "$BACKEND/deploy/windows/." "$OUT/deploy/"
+cp "$BACKEND/deploy/windows/部署说明-Windows.txt" "$OUT/"
 
-# 前端源码（排除 node_modules、dist、.git）
-echo "==> 复制前端源码 $FRONTEND"
+echo "==> 复制前端源码（排除 node_modules / dist / .git）"
 if command -v rsync >/dev/null 2>&1; then
   rsync -a \
     --exclude node_modules \
@@ -67,9 +85,32 @@ cat > "$OUT/frontend/.env.production" <<'EOF'
 VITE_API_BASE_URL=/api
 EOF
 
-cd "$ROOT/release"
-zip -r "$(basename "$ZIP")" "$(basename "$OUT")"
+cat > "$OUT/版本说明.txt" <<EOF
+包包洗护门店系统 合并安装包
+打包时间: $(date '+%Y-%m-%d %H:%M:%S')
+后端路径: $BACKEND
+前端路径: $FRONTEND
+
+目录:
+  backend/   后端（dist + prisma）
+  frontend/  前端源码（安装时 npm build）
+  deploy/    Windows 脚本
+
+首次: deploy\\00-一键安装.bat
+启动: deploy\\01-启动系统.bat
+访问: http://localhost:3001
+账号: admin / admin
+EOF
+
+echo "==> 压缩 zip"
+cd "$BACKEND/release"
+zip -rq "$(basename "$ZIP")" "$(basename "$OUT")"
+
 echo ""
-echo "完成: $ZIP"
-echo "包含: backend/ + frontend/ + deploy/一键安装脚本"
-echo "客户 Windows: 安装 Node + Docker 后，运行 deploy\\00-一键安装.bat"
+echo "=========================================="
+echo "  打包完成"
+echo "  文件夹: $OUT"
+echo "  ZIP:     $ZIP"
+echo "  大小:    $(du -sh "$ZIP" | cut -f1)"
+echo "=========================================="
+echo "发给客户后: 解压 → 安装 Node + Docker → deploy\\00-一键安装.bat"

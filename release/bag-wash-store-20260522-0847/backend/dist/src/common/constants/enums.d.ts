@@ -1,0 +1,11 @@
+export declare const ORDER_STATUS: readonly ["pending_receive", "washing", "repairing", "finished", "wait_pickup", "picked_up"];
+export declare const WASH_SERVICES: readonly ["fine_wash", "deep_stain", "hardware_polish", "color_restore", "care"];
+export declare const CUSTOMER_TAGS: readonly ["普通", "VIP", "储值"];
+export declare const STAFF_STATUS: readonly ["在职", "离职"];
+export declare const ASSIGNABLE_PERMISSIONS: readonly ["dashboard", "order", "customer", "service"];
+export declare const PERMISSIONS: readonly ["dashboard", "order", "customer", "service", "staff"];
+export type OrderStatus = (typeof ORDER_STATUS)[number];
+export type WashServiceCode = (typeof WASH_SERVICES)[number];
+export type CustomerTag = (typeof CUSTOMER_TAGS)[number];
+export type StaffStatus = (typeof STAFF_STATUS)[number];
+export type Permission = (typeof PERMISSIONS)[number];

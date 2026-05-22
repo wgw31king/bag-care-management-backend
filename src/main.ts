@@ -1,6 +1,7 @@
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { NextFunction, Request, Response } from 'express';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { AppModule } from './app.module';
@@ -36,7 +37,7 @@ async function bootstrap() {
     const abs = join(process.cwd(), frontendDist);
     if (existsSync(join(abs, 'index.html'))) {
       app.useStaticAssets(abs);
-      app.use((req, res, next) => {
+      app.use((req: Request, res: Response, next: NextFunction) => {
         if (req.method !== 'GET' && req.method !== 'HEAD') {
           return next();
         }

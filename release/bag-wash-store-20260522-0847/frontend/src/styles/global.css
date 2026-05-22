@@ -1,0 +1,53 @@
+:root {
+  --bw-primary: #1565c0;
+  --bw-primary-dark: #0d47a1;
+  --bw-bg-page: #f4f7fb;
+  --bw-border: #e2e8f0;
+  --bw-text: #1e293b;
+  --bw-text-secondary: #64748b;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family:
+    'PingFang SC',
+    'Microsoft YaHei',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  color: var(--bw-text);
+  background: var(--bw-bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--bw-primary);
+}
+
+/* Element Plus 主题微调：蓝色商务 */
+.el-button--primary {
+  --el-button-bg-color: #1565c0;
+  --el-button-border-color: #1565c0;
+  --el-button-hover-bg-color: #1976d2;
+  --el-button-hover-border-color: #1976d2;
+  --el-button-active-bg-color: #0d47a1;
+  --el-button-active-border-color: #0d47a1;
+}
+
+.el-pagination.is-background .el-pager li.is-active {
+  background-color: #1565c0 !important;
+}

@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String  @id @default(cuid())
+  username     String  @unique
+  passwordHash String  @map("password_hash")
+  displayName  String  @map("display_name")
+  staffId      String? @unique @map("staff_id")
+  staff        Staff?  @relation(fields: [staffId], references: [id], onDelete: SetNull)
+
+  @@map("users")
+}
+
+model Staff {
+  id          String  @id @default(cuid())
+  name        String
+  phone       String  @unique
+  role        String
+  status      String  @default("在职")
+  permissions Json    @default("[]")
+  user        User?
+
+  @@map("staff")
+}
+
+model Customer {
+  id          String  @id @default(cuid())
+  name        String
+  phone       String  @unique
+  wechat      String  @default("")
+  tag         String  @default("普通")
+  orderCount  Int     @default(0) @map("order_count")
+  lastVisit   String? @map("last_visit")
+  remark      String  @default("")
+  orders      Order[]
+
+  @@map("customers")
+}
+
+model Order {
+  id               String   @id @default(cuid())
+  orderNo          String   @unique @map("order_no")
+  customerName     String   @map("customer_name")
+  phone            String
+  wechatNote       String   @default("") @map("wechat_note")
+  brand            String
+  style            String
+  color            String
+  material         String
+  defectDesc       String   @map("defect_desc")
+  defectImages     Json     @default("[]") @map("defect_images")
+  washServices     Json     @default("[]") @map("wash_services")
+  orderTime        String   @map("order_time")
+  expectPickupTime String   @map("expect_pickup_time")
+  amount           Decimal  @db.Decimal(12, 2)
+  prepay           Decimal  @db.Decimal(12, 2)
+  remark           String   @default("")
+  status           String   @default("pending_receive")
+  createdAt        BigInt    @map("created_at")
+  deletedAt        DateTime? @map("deleted_at")
+  customerId       String?   @map("customer_id")
+  customer         Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([phone])
+  @@index([status])
+  @@index([orderTime])
+  @@index([deletedAt])
+  @@map("orders")
+}
+
+model WashService {
+  id          String  @id @default(cuid())
+  code        String? @unique
+  name        String
+  price       Decimal @db.Decimal(12, 2)
+  durationMin Int     @map("duration_min")
+  enabled     Boolean @default(true)
+  sort        Int     @default(0)
+
+  @@map("wash_services")
+}
