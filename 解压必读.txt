@@ -1,0 +1,31 @@
+包包洗护 - 解压必读
+==================
+
+【正确解压方式】
+1. 把 zip 复制到桌面，例如: C:\Users\Administrator\Desktop\
+2. 右键 zip -> 解压到当前文件夹 / 全部提取
+3. 解压后应直接看到（不要多一层同名文件夹）:
+
+   backend
+   frontend
+   deploy
+   uploads
+   docker-compose.yml
+   解压必读.txt
+
+4. 进入 deploy 文件夹，双击 install.bat 或 00-install.bat
+
+【错误示例 - 会导致“文件名语法不正确”】
+Desktop\bag-wash-store-xxx\bag-wash-store-xxx\deploy
+（套了两层同名目录）
+
+【解决办法】
+把内层 bag-wash-store-xxx 里的 backend、frontend、deploy 等
+全部移动到外层文件夹即可。
+
+【安装】
+需 Node.js 18+ 、 Docker Desktop
+首次: deploy\install.bat
+启动: deploy\start.bat
+访问: http://localhost:3001
+账号: admin  密码: admin

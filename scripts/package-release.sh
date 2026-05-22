@@ -86,6 +86,19 @@ cat > "$OUT/frontend/.env.production" <<'EOF'
 VITE_API_BASE_URL=/api
 EOF
 
+cp "$BACKEND/解压必读.txt" "$OUT/"
+
+cat > "$OUT/安装.bat" <<'EOF'
+@echo off
+cd /d "%~dp0deploy"
+call install.bat
+EOF
+cat > "$OUT/启动.bat" <<'EOF'
+@echo off
+cd /d "%~dp0deploy"
+call start.bat
+EOF
+
 cat > "$OUT/版本说明.txt" <<EOF
 包包洗护门店系统 合并安装包
 打包时间: $(date '+%Y-%m-%d %H:%M:%S')
@@ -97,15 +110,16 @@ cat > "$OUT/版本说明.txt" <<EOF
   frontend/  前端源码（安装时 npm build）
   deploy/    Windows 脚本
 
+解压后见 解压必读.txt
 首次: deploy\\install.bat
-启动: deploy\\01-启动系统.bat
+启动: deploy\\start.bat
 访问: http://localhost:3001
 账号: admin / admin
 EOF
 
-echo "==> 压缩 zip"
-cd "$BACKEND/release"
-zip -rq "$(basename "$ZIP")" "$(basename "$OUT")"
+echo "==> 压缩 zip（根目录直接是 backend/frontend/deploy，避免双层文件夹）"
+cd "$OUT"
+zip -rq "$ZIP" .
 
 echo ""
 echo "=========================================="
