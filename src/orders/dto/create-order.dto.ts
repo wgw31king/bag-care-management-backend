@@ -8,7 +8,7 @@ import {
   IsString,
   Min,
 } from 'class-validator';
-import { ORDER_STATUS, WASH_SERVICES } from '../../common/constants/enums';
+import { ORDER_STATUS } from '../../common/constants/enums';
 import { IsDateTimeString } from '../../common/validators/datetime-string.validator';
 import { NoBase64DataUrl } from '../../common/validators/no-base64-url.validator';
 
@@ -53,7 +53,7 @@ export class CreateOrderDto {
 
   @IsArray()
   @ArrayNotEmpty()
-  @IsIn([...WASH_SERVICES], { each: true })
+  @IsString({ each: true })
   washServices: string[];
 
   @IsString()

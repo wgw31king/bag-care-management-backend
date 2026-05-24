@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { toWashServiceJson } from '../common/utils/serialize';
 import { PrismaService } from '../prisma/prisma.service';
@@ -50,13 +54,32 @@ export class WashServicesService {
     return toWashServiceJson(row);
   }
 
+  private async resolveCode(raw?: string): Promise<string> {
+    const trimmed = raw?.trim();
+    if (trimmed) {
+      const exists = await this.prisma.washService.findUnique({
+        where: { code: trimmed },
+      });
+      if (exists) {
+        throw new ConflictException('项目编码已存在');
+      }
+      return trimmed;
+    }
+    let code: string;
+    do {
+      code = `svc_${Date.now()}`;
+    } while (await this.prisma.washService.findUnique({ where: { code } }));
+    return code;
+  }
+
   async create(dto: CreateWashServiceDto) {
     const maxSort = await this.prisma.washService.aggregate({
       _max: { sort: true },
     });
+    const code = await this.resolveCode(dto.code);
     const row = await this.prisma.washService.create({
       data: {
-        code: dto.code ?? null,
+        code,
         name: dto.name,
         price: dto.price,
         durationMin: dto.durationMin,

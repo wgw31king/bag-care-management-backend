@@ -1,0 +1,15 @@
+包包洗护门店系统 合并安装包
+打包时间: 2026-05-24 16:31:59
+后端路径: /Users/wahhh/bag-wash-manage-backend
+前端路径: /Users/wahhh/bag-wash-manage
+
+目录:
+  backend/   后端（dist + prisma）
+  frontend/  前端源码（安装时 npm build）
+  deploy/    Windows 脚本
+
+解压后见 解压必读.txt
+首次: deploy\install.bat
+启动: deploy\start.bat
+访问: http://localhost:3001
+账号: admin / admin

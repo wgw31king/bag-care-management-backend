@@ -1,18 +1,19 @@
 import {
   IsBoolean,
-  IsIn,
   IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
   Min,
 } from 'class-validator';
-import { WASH_SERVICES } from '../../common/constants/enums';
 
 export class CreateWashServiceDto {
+  /** 可选；留空则由服务端自动生成唯一编码 */
   @IsOptional()
-  @IsIn([...WASH_SERVICES])
+  @IsString()
+  @MaxLength(64)
   code?: string;
 
   @IsString()
